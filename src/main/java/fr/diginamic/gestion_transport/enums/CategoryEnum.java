@@ -1,0 +1,14 @@
+package fr.diginamic.gestion_transport.enums;
+
+public enum CategoryEnum {
+	MICRO_URBAINES,
+	MINI_CITADINES,
+	CITADINES_POLYVALENTES,
+	COMPACTES,
+	BERLINES_TAILLE_S,
+	BERLINES_TAILLE_M,
+	BERLINES_TAILLE_L,
+	SUV,
+	TOUT_TERRAINS,
+	PICK_UP
+}
