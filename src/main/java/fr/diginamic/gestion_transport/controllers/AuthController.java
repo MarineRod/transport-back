@@ -1,5 +1,7 @@
 package fr.diginamic.gestion_transport.controllers;
 
+import fr.diginamic.gestion_transport.security.CustomUserDetailsService;
+import fr.diginamic.gestion_transport.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.diginamic.gestion_transport.security.CustomUserDetailsService;
-import fr.diginamic.gestion_transport.security.JwtUtil;
-
 /**
  * Contrôleur en charge de l'authentification
  */
@@ -22,19 +21,27 @@ import fr.diginamic.gestion_transport.security.JwtUtil;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    /** authenticationManager : permet d'authentifier l'utilisateur */
+    /**
+     * authenticationManager : permet d'authentifier l'utilisateur
+     */
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    /** Pour générer un token lors de l'authentification */
+    /**
+     * Pour générer un token lors de l'authentification
+     */
     @Autowired
     private JwtUtil jwtUtil;
 
-    /** Permet d'aller cherche en base les infos utilisateur */
+    /**
+     * Permet d'aller cherche en base les infos utilisateur
+     */
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
-    /** Endpoint de LOGIN qui reçoit un body contenant 2 infos : username et password (non crypté)
+    /**
+     * Endpoint de LOGIN qui reçoit un body contenant 2 infos : username et password (non crypté)
+     *
      * @param authRequest le body de la requête HTTP
      * @return {@link ResponseEntity}
      */
@@ -42,11 +49,11 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
         try {
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-            String jwt = jwtUtil.generateToken(userDetails.getUsername());
+            String jwt = jwtUtil.generateToken(userDetails);
 
             return ResponseEntity.ok(new AuthResponse(jwt));
         } catch (BadCredentialsException e) {
