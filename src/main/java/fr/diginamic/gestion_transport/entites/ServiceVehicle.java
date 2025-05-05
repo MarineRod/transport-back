@@ -2,6 +2,7 @@ package fr.diginamic.gestion_transport.entites;
 
 
 import fr.diginamic.gestion_transport.enums.CategoryEnum;
+import fr.diginamic.gestion_transport.enums.MotorizationEnum;
 import fr.diginamic.gestion_transport.enums.VehicleStatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,11 +22,11 @@ public class ServiceVehicle extends Vehicle{
 	private String photoUrl;
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private VehicleStatusEnum vehicle;
-	@Column(nullable = false)
+	private VehicleStatusEnum status;
+	@Enumerated(EnumType.STRING)
 	private CategoryEnum category;
-	
+	@Enumerated(EnumType.STRING)
+	private MotorizationEnum motorization;
 	@OneToMany(mappedBy="serviceVehicle")
 	private List<ServiceVehicleBooking> serviceVehicleBookings;
-
 }

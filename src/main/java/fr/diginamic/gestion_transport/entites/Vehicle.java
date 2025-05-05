@@ -1,6 +1,7 @@
 package fr.diginamic.gestion_transport.entites;
 
 import fr.diginamic.gestion_transport.enums.BrandEnum;
+import fr.diginamic.gestion_transport.enums.MotorizationEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -24,7 +25,6 @@ public class Vehicle {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private BrandEnum Brand;
-
 	@OneToMany(mappedBy = "vehicle")
 	private List<Carpooling> carpoolings;
 }
