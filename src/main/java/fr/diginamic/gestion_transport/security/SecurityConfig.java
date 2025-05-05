@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
 /**
  * Configure la sécurité
@@ -36,6 +37,7 @@ public class SecurityConfig {
 	    http.csrf(AbstractHttpConfigurer::disable) // Désactiver CSRF
 	        .authorizeHttpRequests(authorize -> authorize
 	            .requestMatchers("/api/auth/**").permitAll() // Autoriser /api/auth sans authentification
+				.requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Autoriser toutes les requêtes preflight pour éviter les CORS
 	            .anyRequest().authenticated() // Tous les autres endpoints sont authentifiés
 	        );
 	    http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
