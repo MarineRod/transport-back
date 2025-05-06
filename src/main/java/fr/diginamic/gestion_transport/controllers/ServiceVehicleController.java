@@ -6,9 +6,7 @@ import fr.diginamic.gestion_transport.service.ServiceVehicleService;
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,9 +20,26 @@ public class ServiceVehicleController {
     private ServiceVehicleService serviceVehicleService;
 
     @GetMapping("/get-all")
-    public List<ServiceVehicleDTO> getAll() {
+    public List<ServiceVehicleDTO> getAll() throws Exception {
         List<ServiceVehicle> serviceVehicles = this.serviceVehicleService.getAllVehicleService();
         return serviceVehicles.stream().map(sv -> mapper.map(sv, ServiceVehicleDTO.class)).toList();
 
+    }
+
+    @GetMapping("/get/{licensePlateNumber}")
+    public ServiceVehicleDTO get(@PathVariable String licensePlateNumber) throws Exception {
+        ServiceVehicle serviceVehicle = this.serviceVehicleService.getServiceVehicleByLicensePlat(licensePlateNumber);
+        return mapper.map(serviceVehicle, ServiceVehicleDTO.class);
+    }
+
+    @DeleteMapping("/delete/{licensePlateNumber}")
+    public void delete(@PathVariable String licensePlateNumber) throws Exception {
+        this.serviceVehicleService.deleteServiceVehicle(licensePlateNumber);
+    }
+
+    @PostMapping("/save")
+    public ServiceVehicleDTO save(@RequestBody ServiceVehicleDTO serviceVehicleDTO) throws Exception {
+        ServiceVehicle serviceVehicle = mapper.map(serviceVehicleDTO, ServiceVehicle.class);
+        return mapper.map(this.serviceVehicleService.saveServiceVehicle(serviceVehicle), ServiceVehicleDTO.class);
     }
 }

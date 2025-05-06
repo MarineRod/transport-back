@@ -23,4 +23,5 @@ public class ServiceVehicleDTO {
     private String model;
     private Integer nbSeats;
     private BrandEnum brand;
+    private VehicleStatusEnum status;
 }
