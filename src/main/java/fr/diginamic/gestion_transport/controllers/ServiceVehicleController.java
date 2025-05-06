@@ -21,11 +21,10 @@ public class ServiceVehicleController {
         this.serviceVehicleService = serviceVehicleService;
     }
 
-    @GetMapping("")
+	@GetMapping("")
     public List<ServiceVehicleDTO> getAll() throws Exception {
         List<ServiceVehicle> serviceVehicles = this.serviceVehicleService.getAllVehicleService();
         return serviceVehicles.stream().map(sv -> mapper.map(sv, ServiceVehicleDTO.class)).toList();
-
     }
 
     @GetMapping("/{licensePlateNumber}")

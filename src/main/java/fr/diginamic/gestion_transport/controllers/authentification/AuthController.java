@@ -1,8 +1,7 @@
-package fr.diginamic.gestion_transport.controllers;
+package fr.diginamic.gestion_transport.controllers.authentification;
 
 import fr.diginamic.gestion_transport.security.CustomUserDetailsService;
 import fr.diginamic.gestion_transport.security.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
