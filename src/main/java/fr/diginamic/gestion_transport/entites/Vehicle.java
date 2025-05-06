@@ -30,4 +30,8 @@ public class Vehicle {
 	@ManyToOne
 	@JoinColumn(name = "USER_ID")
 	private User user;
+
+    public String getBrandModel(){
+        return Brand.name().toUpperCase() + " " + model;
+    }
 }
