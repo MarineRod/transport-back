@@ -21,8 +21,12 @@ import fr.diginamic.gestion_transport.repositories.UserRepository;
 public class CustomUserDetailsService implements UserDetailsService {
 
     /** Pour l'accès en base de données */
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

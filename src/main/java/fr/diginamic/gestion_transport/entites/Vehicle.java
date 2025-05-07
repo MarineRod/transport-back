@@ -27,4 +27,7 @@ public class Vehicle {
 	private BrandEnum Brand;
 	@OneToMany(mappedBy = "vehicle")
 	private List<Carpooling> carpoolings;
+	@ManyToOne
+	@JoinColumn(name = "USER_ID")
+	private User user;
 }

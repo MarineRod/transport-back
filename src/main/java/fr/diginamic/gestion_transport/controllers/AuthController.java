@@ -24,20 +24,23 @@ public class AuthController {
     /**
      * authenticationManager : permet d'authentifier l'utilisateur
      */
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     /**
      * Pour générer un token lors de l'authentification
      */
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     /**
      * Permet d'aller cherche en base les infos utilisateur
      */
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+
+    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+    }
 
     /**
      * Endpoint de LOGIN qui reçoit un body contenant 2 infos : username et password (non crypté)

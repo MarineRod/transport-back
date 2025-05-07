@@ -4,7 +4,6 @@ import fr.diginamic.gestion_transport.entites.ServiceVehicle;
 import fr.diginamic.gestion_transport.repositories.ServiceVehicleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +13,11 @@ public class ServiceVehicleService {
 
     private final Logger LOG = LoggerFactory.getLogger(ServiceVehicleService.class);
 
-    @Autowired
-    private ServiceVehicleRepository serviceVehicleRepository;
+    private final ServiceVehicleRepository serviceVehicleRepository;
+
+    public ServiceVehicleService(ServiceVehicleRepository serviceVehicleRepository) {
+        this.serviceVehicleRepository = serviceVehicleRepository;
+    }
 
     public List<ServiceVehicle> getAllVehicleService() throws Exception {
         try {

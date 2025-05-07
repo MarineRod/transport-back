@@ -24,8 +24,13 @@ import org.springframework.web.cors.CorsUtils;
 public class SecurityConfig {
 	
 	/** Filtre HTTP */
-	@Autowired
-	private JwtAuthenticationFilter jwtFilter;
+	private final JwtAuthenticationFilter jwtFilter;
+
+	public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+		this.jwtFilter = jwtFilter;
+	}
+
+
 
 	/** Met en place la sécurité
 	 * @param http http security

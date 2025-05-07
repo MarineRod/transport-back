@@ -20,12 +20,9 @@ public class ServiceVehicleBooking {
 	private LocalDateTime dateTimeStart;
 	@Column(nullable = false)
 	private LocalDateTime dateTimeEnd;
-
-
 	@ManyToOne
 	@JoinColumn(name = "SERVICE_VEHICLE_ID")
 	private ServiceVehicle serviceVehicle;
-
 	@ManyToOne
 	@JoinColumn(name = "USER_ID")
 	private User user;

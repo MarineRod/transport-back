@@ -1,5 +1,6 @@
 package fr.diginamic.gestion_transport.entites;
 
+import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,8 +28,7 @@ public class Carpooling {
 	private String arrivalAddress;
 	@Column(nullable = false)
 	private Integer duration;
-
-
+	private Integer nbSeats;
 	@ManyToOne
 	@JoinColumn(name = "vehicle_id")
 	private Vehicle vehicle;

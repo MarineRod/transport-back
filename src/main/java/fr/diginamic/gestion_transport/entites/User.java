@@ -41,4 +41,7 @@ public class User {
 
 	@OneToMany(mappedBy="user")
 	private Set<ServiceVehicleBooking> serviceVehicleBooking;
+
+    @OneToMany(mappedBy = "user")
+    private List<Vehicle> vehicles;
 }
