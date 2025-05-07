@@ -60,7 +60,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new AuthResponse(jwt));
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou mot de passe incorrect");
         }
     }
 }
