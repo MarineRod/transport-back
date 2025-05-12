@@ -2,7 +2,11 @@ package fr.diginamic.gestion_transport.service;
 
 import fr.diginamic.gestion_transport.dto.CarpoolingDTO;
 import fr.diginamic.gestion_transport.entites.Carpooling;
+import fr.diginamic.gestion_transport.entites.User;
 import fr.diginamic.gestion_transport.repositories.CarpoolingRepository;
+import fr.diginamic.gestion_transport.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
 import io.micrometer.common.util.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -11,17 +15,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
 @Service
 public class CarpoolingService {
 
+    private final Logger LOG = LoggerFactory.getLogger(ServiceVehicleService.class);
     private final ModelMapper mapper = ModelMapperCfg.getInstance();
 
-    private final Logger LOG = LoggerFactory.getLogger(CarpoolingService.class);
-
     private final CarpoolingRepository carpoolingRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public CarpoolingService(CarpoolingRepository carpoolingRepository) {
+    public CarpoolingService(CarpoolingRepository carpoolingRepository, UserService userService, UserRepository userRepository) {
         this.carpoolingRepository = carpoolingRepository;
+        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public Carpooling saveCarpooling(CarpoolingDTO carpooling) throws Exception {
@@ -74,4 +85,40 @@ public class CarpoolingService {
             throw new Exception("Impossible de trouver l'annonce de covoiturage");
         }
     }
+
+    public List<Carpooling> getUserBookings(Boolean isArchived) throws Exception {
+
+        User connectedUser = userService.getConnectedUser();
+        try {
+            if (!isArchived) {
+                return this.carpoolingRepository.findCarpoolingByUsersContainsAndDateTimeStartAfter(connectedUser, LocalDateTime.now());
+            }else{
+                return this.carpoolingRepository.findCarpoolingByUsersContainsAndDateTimeStartBefore(connectedUser, LocalDateTime.now());
+            }
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            throw new Exception("Impossible de récupérer la liste des réservations de covoiturage");
+        }
+    }
+
+    public Integer getNbPlacesRemaining(Carpooling carpooling) {
+        Set<User> participants = carpooling.getUsers();
+        int nbPlaces = carpooling.getVehicle().getNbSeats() - 1;
+
+        return nbPlaces - participants.size();
+    }
+
+    @Transactional
+    public void cancelUserBooking(Integer idCarpooling) {
+        User user = userService.getConnectedUser();
+        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException("Ce covoiturage n'existe pas"));
+
+        carpooling.getUsers().remove(user);
+        user.getCarpoolings().remove(carpooling);
+
+
+        this.carpoolingRepository.save(carpooling);
+        this.userRepository.save(user);
+    }
+
 }

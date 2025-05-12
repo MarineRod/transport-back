@@ -1,11 +1,11 @@
 package fr.diginamic.gestion_transport.service;
 
+import fr.diginamic.gestion_transport.entites.User;
 import fr.diginamic.gestion_transport.repositories.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import fr.diginamic.gestion_transport.entites.User;
 
 
 @Service
@@ -20,6 +20,6 @@ public class UserService {
     public User getConnectedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + authentication.getName()));
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé: " + authentication.getName()));
     }
 }
