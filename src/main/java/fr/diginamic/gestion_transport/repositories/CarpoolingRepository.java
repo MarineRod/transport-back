@@ -22,4 +22,8 @@ public interface CarpoolingRepository extends JpaRepository<Carpooling, Integer>
     @Modifying
     @Query("DELETE FROM Carpooling cp WHERE cp.id = :id AND cp.organisator.id = :userId")
     int deleteByIdAndUserId(@Param("id") Integer id,@Param("userId") Long userId);
+
+    List<Carpooling> findAllByOrganisatorIdAndDateTimeStartBefore(Long id, LocalDateTime now);
+
+    List<Carpooling> findAllByOrganisatorIdAndDateTimeStartAfter(Long id, LocalDateTime now);
 }

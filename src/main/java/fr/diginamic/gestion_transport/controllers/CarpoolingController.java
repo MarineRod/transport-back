@@ -27,7 +27,6 @@ public class CarpoolingController {
 
     private final UserService userService;
 
-
     public CarpoolingController(CarpoolingService carpoolingService, UserService userService) {
         this.carpoolingService = carpoolingService;
         this.userService = userService;
@@ -85,5 +84,17 @@ public class CarpoolingController {
         response.put("message", "Réservation annulée avec succès");
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/organisator")
+    public List<CarpoolingDTO> getAllOrganisatorCarpooling(@RequestParam Boolean isArchived) throws Exception {
+        List<Carpooling> carpoolings = this.carpoolingService.getAllOrganisatorCarpooling(isArchived);
+        return carpoolings.stream()
+                .map(carpooling -> {
+                    CarpoolingDTO dto = mapper.map(carpooling, CarpoolingDTO.class);
+                    dto.setNbSeatsRemaining(carpoolingService.getNbPlacesRemaining(carpooling));
+                    return dto;
+                })
+                .toList();
     }
 }

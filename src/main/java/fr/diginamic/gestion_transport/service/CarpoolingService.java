@@ -121,4 +121,17 @@ public class CarpoolingService {
         this.userRepository.save(user);
     }
 
+    public List<Carpooling> getAllOrganisatorCarpooling(boolean isArchived) throws Exception {
+        try {
+            User user = userService.getConnectedUser();
+            List<Carpooling> carpoolings;
+            if (isArchived)
+                return this.carpoolingRepository.findAllByOrganisatorIdAndDateTimeStartBefore(user.getId(), LocalDateTime.now());
+            else
+                return this.carpoolingRepository.findAllByOrganisatorIdAndDateTimeStartAfter(user.getId(), LocalDateTime.now());
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            throw new Exception("Impossible de récupérer la liste de mes covoiturages");
+        }
+    }
 }

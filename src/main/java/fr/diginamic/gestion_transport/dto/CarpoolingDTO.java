@@ -1,6 +1,5 @@
 package fr.diginamic.gestion_transport.dto;
 
-import fr.diginamic.gestion_transport.entites.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,5 +22,6 @@ public class CarpoolingDTO {
     private VehicleDTO vehicle;
     private UserDTO organisator;
     private Integer nbSeats;
-    private List<User> users;
+    private int nbSeatsRemaining;
+    private List<UserDTO> users;
 }
