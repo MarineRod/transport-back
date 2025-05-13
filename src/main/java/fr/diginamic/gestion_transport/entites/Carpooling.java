@@ -1,6 +1,5 @@
 package fr.diginamic.gestion_transport.entites;
 
-import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +36,7 @@ public class Carpooling {
 	@JoinColumn(name = "user_id")
 	private User organisator;
 
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.REMOVE)
 	@JoinTable(name = "USER_CARPOOLING",
 			joinColumns = @JoinColumn(name = "ID_CARPOOLING", referencedColumnName = "ID"),
 			inverseJoinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID")
