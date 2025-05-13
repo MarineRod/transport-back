@@ -1,6 +1,5 @@
 package fr.diginamic.gestion_transport.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,19 +21,18 @@ import org.springframework.web.cors.CorsUtils;
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
-	
-	/** Filtre HTTP */
+
 	private final JwtAuthenticationFilter jwtFilter;
 
 	public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
 		this.jwtFilter = jwtFilter;
 	}
 
-
-
-	/** Met en place la sécurité
+	/**
+	 * Met en place la sécurité
+	 * 
 	 * @param http http security
-	 * @return SecurityFilterChain 
+	 * @return SecurityFilterChain
 	 * @throws Exception en cas de problème
 	 */
 	@Bean
@@ -42,8 +40,8 @@ public class SecurityConfig {
 	    http.csrf(AbstractHttpConfigurer::disable) // Désactiver CSRF
 	        .authorizeHttpRequests(authorize -> authorize
 	            .requestMatchers("/api/auth/**").permitAll() // Autoriser /api/auth sans authentification
-				.requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Autoriser toutes les requêtes preflight pour éviter les CORS
-	            .anyRequest().authenticated() // Tous les autres endpoints sont authentifiés
+					.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+					.anyRequest().authenticated() // Tous les autres endpoints sont authentifiés
 	        );
 	    http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 	    return http.build();

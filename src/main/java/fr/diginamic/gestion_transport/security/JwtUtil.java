@@ -1,19 +1,15 @@
 package fr.diginamic.gestion_transport.security;
 
-import java.util.Date;
-import java.util.List;
-
-import fr.diginamic.gestion_transport.entites.User;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Fournit des services de génération de token JWT et de vérification
@@ -82,5 +78,4 @@ public class JwtUtil {
 				.parseClaimsJws(token).getBody().getExpiration();
 		return expiration.before(new Date());
 	}
-
 }
