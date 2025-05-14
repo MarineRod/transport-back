@@ -9,10 +9,10 @@
 		<version>3.4.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>fr.diginamic</groupId>
-	<artifactId>gestion-transport</artifactId>
+	<groupId>Projet-CDA-Groupe-2-Gestion-transport</groupId>
+	<artifactId>gestion-transport-back</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>gestion-transport</name>
+	<name>Gestion transport</name>
 	<description>Demo project for Spring Boot</description>
 	<url />
 	<licenses>
@@ -29,6 +29,10 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.projectKey>Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back</sonar.projectKey>
+		<sonar.projectName>gestion-transport-back</sonar.projectName>
+		<sonar.organization>projetcdagroupe2gestiontransport</sonar.organization>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -95,6 +99,32 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>4.0.0.4121</version>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,0 +1,132 @@
+name: CI/CD Back - Gestion des transports
+# Executé seulement lors des merge sur main, permet d'obtenir un rapport SonarCube
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test unitaires (JaCoco)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code              # Récupération du code sur la VM
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configuration de JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache des dépendances Maven   # Mise en cache des dépendances Maven pour ne pas avoir à les télécharger à chaque fois
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Execution Tests               # Exécution des tests unitaires
+        run: mvn clean test jacoco:report
+
+      - name: Archivage du rapport JaCoCo   # On sauvegarde le rapport jaCoco
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+
+  sonarqube:
+    name: Analyse SonarCloud
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Installer jq                  # Package permettant de manipuler du JSON en shell
+        run: sudo apt-get install jq
+
+      - name: Checkout du code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configuration de JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+
+      - name: Téléchargement du rapport JaCoCo  # On télécharge le rapport JaCoco enregistré précédemment, il va être récupéré automatiquement par SonarQube pour le code Coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+
+      - name: Compilation du code (sans tests)
+        run: mvn clean compile -DskipTests
+
+      - name: Analyse SonarCloud                # Analyse SonarQube via SonarCloud
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Correspond à un secret défini dans le repository Github
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back
+
+      - name: Vérification du Quality Gate      # On vérifie que le rapport SonarQube généré ne contient pas d'erreurs, si oui, le job est mis en erreur.
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          # Attendre que l'analyse soit traitée (optionnel mais recommandé)
+          sleep 15
+
+          # Récupérer l'analyse la plus récente
+          analysisId=$(curl -s -u $SONAR_TOKEN: "https://sonarcloud.io/api/ce/component?component=Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back" | jq -r '.queue[0].id')
+
+          # Vérifier le statut du Quality Gate
+          status=$(curl -s -u $SONAR_TOKEN: "https://sonarcloud.io/api/qualitygates/project_status?analysisId=$analysisId" | jq -r '.projectStatus.status')
+
+          echo "Quality Gate status: $status"
+          if [ "$status" != "OK" ]; then
+            echo "La Quality Gate a échoué !"
+            exit 1
+          fi
+
+  build:                                        # Build pour un possible deploy après
+    name: Build du projet
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Construction du projet
+        run: mvn -B package --file pom.xml -DskipTests
+
+      - name: Archivage des artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: target/*.jar
+
+
+
+
