@@ -2,6 +2,7 @@ package fr.diginamic.gestion_transport.controllers;
 
 import fr.diginamic.gestion_transport.dto.CarpoolingBookingDTO;
 import fr.diginamic.gestion_transport.dto.CarpoolingDTO;
+import fr.diginamic.gestion_transport.dto.CarpoolingSearchDTO;
 import fr.diginamic.gestion_transport.dto.UserDTO;
 import fr.diginamic.gestion_transport.entites.Carpooling;
 import fr.diginamic.gestion_transport.entites.User;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +94,26 @@ public class CarpoolingController {
                 .map(carpooling -> {
                     CarpoolingDTO dto = mapper.map(carpooling, CarpoolingDTO.class);
                     dto.setNbSeatsRemaining(carpoolingService.getNbPlacesRemaining(carpooling));
+                    return dto;
+                })
+                .toList();
+    }
+
+    @GetMapping("/search")
+    public List<CarpoolingSearchDTO> search(
+            @RequestParam(required = false) String departureAddress,
+            @RequestParam(required = false) String arrivalAddress,
+            @RequestParam(required = false) LocalDate dateTimeStart) throws Exception {
+        List<Carpooling> carpoolings = this.carpoolingService.search(departureAddress, arrivalAddress, dateTimeStart);
+        return carpoolings.stream()
+                .map(carpooling -> {
+                    CarpoolingSearchDTO dto = mapper.map(carpooling, CarpoolingSearchDTO.class);
+                    dto.setNbSeatsRemaining(carpoolingService.getNbPlacesRemaining(carpooling));
+                    if (carpooling.getVehicle() != null) {
+                        dto.setVehicle(carpooling.getVehicle().getBrandModel());
+                    } else {
+                        dto.setVehicle("Inconnu");
+                    }
                     return dto;
                 })
                 .toList();

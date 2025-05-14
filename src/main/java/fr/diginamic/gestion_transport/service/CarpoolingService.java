@@ -7,9 +7,9 @@ import fr.diginamic.gestion_transport.entites.User;
 import fr.diginamic.gestion_transport.enums.MailTemplateEnum;
 import fr.diginamic.gestion_transport.repositories.CarpoolingRepository;
 import fr.diginamic.gestion_transport.repositories.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
 import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -17,7 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -129,11 +131,11 @@ public class CarpoolingService {
 
     public Integer getNbPlacesRemaining(Carpooling carpooling) {
         Set<User> participants = carpooling.getUsers();
-        int nbPlaces = carpooling.getVehicle().getNbSeats() - 1;
-
+        int nbPlaces = carpooling.getNbSeats();
         return nbPlaces - participants.size();
     }
 
+    @Transactional
     public void cancelUserBooking(Integer idCarpooling) {
         User user = userService.getConnectedUser();
         Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException("Ce covoiturage n'existe pas"));
@@ -157,5 +159,22 @@ public class CarpoolingService {
             LOG.error(e.getMessage());
             throw new Exception("Impossible de récupérer la liste de mes covoiturages");
         }
+    }
+
+    public List<Carpooling> search(String departureAddress, String arrivalAddress, LocalDate dateTimeStart) throws Exception {
+        int nbCriteria = 0;
+        if (departureAddress != null) nbCriteria++;
+        if (arrivalAddress != null) nbCriteria++;
+        if (dateTimeStart != null) nbCriteria++;
+        if (nbCriteria < 1){
+            throw new Exception("Veuillez saisir au moins un critère de recherche");
+        }
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        if (dateTimeStart != null){
+            start = LocalDateTime.of(dateTimeStart, LocalTime.MIN);
+            end = LocalDateTime.of(dateTimeStart, LocalTime.MAX);
+        }
+        return this.carpoolingRepository.findAllByDepartureAddressContainingIgnoreCaseOrArrivalAddressContainingIgnoreCaseOrDateTimeStartBetween(departureAddress, arrivalAddress, start, end);
     }
 }
