@@ -58,8 +58,6 @@ public class CarpoolingController {
     ) throws Exception {
         List<Carpooling> carpoolingList = this.carpoolingService.getUserBookings(isArchived);
 
-        ModelMapper mapper = new ModelMapper();
-
         return carpoolingList.stream()
                 .map(carpooling -> {
                     CarpoolingBookingDTO dto = mapper.map(carpooling, CarpoolingBookingDTO.class);

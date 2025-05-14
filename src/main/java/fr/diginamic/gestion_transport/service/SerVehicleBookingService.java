@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class SerVehicleBookingService {
 		return modelMapper.map(bookingDto, ServiceVehicleBooking.class);
 	}
 
+	@Transactional(rollbackOn = Exception.class)
 	public ServiceVehicleBookingDTO createBooking(ServiceVehicleBookingDTO bookingDto) {
 		ServiceVehicleBooking booking = convertToEntity(bookingDto);
 		ServiceVehicleBooking savedBooking = serviceVehicleBookingRepository.save(booking);
@@ -58,6 +60,7 @@ public class SerVehicleBookingService {
 	    return convertToDto(booking);
 	}
 
+	@Transactional(rollbackOn = Exception.class)
 	public ServiceVehicleBookingDTO updateBooking(Integer id, ServiceVehicleBookingDTO dto) {
 	    ServiceVehicleBooking booking = serviceVehicleBookingRepository.findById(id)
 	            .orElseThrow(() -> new EntityNotFoundException("Réservation non trouvée avec l'ID : " + id));
@@ -69,6 +72,7 @@ public class SerVehicleBookingService {
 	    return convertToDto(updated);
 	}
 
+	@Transactional(rollbackOn = Exception.class)
 	public void deleteBooking(Integer id) {
 		ServiceVehicleBooking booking = serviceVehicleBookingRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Réservation non trouvée avec l'ID : " + id));

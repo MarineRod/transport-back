@@ -4,6 +4,7 @@ import fr.diginamic.gestion_transport.dto.VehicleDTO;
 import fr.diginamic.gestion_transport.entites.Vehicle;
 import fr.diginamic.gestion_transport.repositories.VehicleRepository;
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ public class VehicleService {
         this.vehicleRepository = vehicleRepository;
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public Vehicle save(Vehicle vehicleToSave) throws Exception {
         try {
             Vehicle vehicle = mapper.map(vehicleToSave, Vehicle.class);
@@ -32,6 +34,7 @@ public class VehicleService {
         }
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public Vehicle save(VehicleDTO vehicleToSave) throws Exception {
         try {
             Vehicle vehicle = mapper.map(vehicleToSave, Vehicle.class);

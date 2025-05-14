@@ -2,6 +2,7 @@ package fr.diginamic.gestion_transport.service;
 
 import fr.diginamic.gestion_transport.entites.ServiceVehicle;
 import fr.diginamic.gestion_transport.repositories.ServiceVehicleRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class ServiceVehicleService {
         }
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public ServiceVehicle saveServiceVehicle(ServiceVehicle serviceVehicle) throws Exception {
         try {
             serviceVehicle.setLicensePlateNumber(serviceVehicle.getLicensePlateNumber().toUpperCase());
@@ -50,6 +52,7 @@ public class ServiceVehicleService {
         }
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public void deleteServiceVehicle(String licensePlateNumber) throws Exception {
         try {
             this.serviceVehicleRepository.deleteByLicensePlateNumber(licensePlateNumber);
