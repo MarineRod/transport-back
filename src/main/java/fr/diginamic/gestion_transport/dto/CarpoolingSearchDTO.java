@@ -23,4 +23,5 @@ public class CarpoolingSearchDTO {
     private UserDTO organisator;
     private Integer nbSeats;
     private int nbSeatsRemaining;
+    private Boolean hasBooked;
 }

@@ -114,6 +114,18 @@ public class CarpoolingService {
         }
     }
 
+    public Set<User> getCarpoolingParticipantList(Integer id) throws Exception {
+        try {
+            Carpooling carpooling = this.carpoolingRepository.findById(id).orElse(null);
+            if (carpooling == null)
+                throw new Exception("Impossible de trouver ce covoiturage");
+            return carpooling.getUsers();
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            throw new Exception("Impossible de trouver ce covoiturage");
+        }
+    }
+
     public List<Carpooling> getUserBookings(Boolean isArchived) throws Exception {
 
         User connectedUser = userService.getConnectedUser();
@@ -148,6 +160,19 @@ public class CarpoolingService {
         this.userRepository.save(user);
     }
 
+    @Transactional
+    public void saveUserBooking(Integer idCarpooling) {
+        User user = userService.getConnectedUser();
+        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException("Ce covoiturage n'existe pas"));
+
+        carpooling.getUsers().add(user);
+        user.getCarpoolings().add(carpooling);
+
+
+        this.carpoolingRepository.save(carpooling);
+        this.userRepository.save(user);
+    }
+
     public List<Carpooling> getAllOrganisatorCarpooling(boolean isArchived) throws Exception {
         try {
             User user = userService.getConnectedUser();
@@ -176,5 +201,12 @@ public class CarpoolingService {
             end = LocalDateTime.of(dateTimeStart, LocalTime.MAX);
         }
         return this.carpoolingRepository.findAllByDepartureAddressContainingIgnoreCaseOrArrivalAddressContainingIgnoreCaseOrDateTimeStartBetween(departureAddress, arrivalAddress, start, end);
+    }
+
+    public Boolean hasUserBooked(Integer idCarpooling){
+        User user = userService.getConnectedUser();
+        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException("Ce covoiturage n'existe pas"));
+
+        return carpooling.getUsers().contains(user);
     }
 }

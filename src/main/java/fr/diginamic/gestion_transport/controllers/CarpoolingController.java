@@ -15,10 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/carpooling")
@@ -55,6 +55,11 @@ public class CarpoolingController {
         return mapper.map(carpooling, CarpoolingDTO.class);
     }
 
+    @GetMapping("/{id}/participants")
+    public Set<User> getCarpoolingParticipantList(@PathVariable Integer id) throws Exception {
+        return this.carpoolingService.getCarpoolingParticipantList(id);
+    }
+
     @GetMapping("user-booking")
     public List<CarpoolingBookingDTO> getUserBooking(
             @RequestParam Boolean isArchived
@@ -75,7 +80,7 @@ public class CarpoolingController {
                 .toList();
     }
 
-    @DeleteMapping("{idCarpooling}/cancel-booking")
+    @DeleteMapping("{idCarpooling}/user-booking")
     public ResponseEntity<?> cancelUserBooking(
             @PathVariable Integer idCarpooling
     ) {
@@ -83,6 +88,18 @@ public class CarpoolingController {
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "Réservation annulée avec succès");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("{idCarpooling}/user-booking")
+    public ResponseEntity<?> saveUserBooking(
+            @PathVariable Integer idCarpooling
+    ) {
+        this.carpoolingService.saveUserBooking(idCarpooling);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Réservation enregistrée avec succès");
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -109,6 +126,7 @@ public class CarpoolingController {
                 .map(carpooling -> {
                     CarpoolingSearchDTO dto = mapper.map(carpooling, CarpoolingSearchDTO.class);
                     dto.setNbSeatsRemaining(carpoolingService.getNbPlacesRemaining(carpooling));
+                    dto.setHasBooked(carpoolingService.hasUserBooked(carpooling.getId()));
                     if (carpooling.getVehicle() != null) {
                         dto.setVehicle(carpooling.getVehicle().getBrandModel());
                     } else {
