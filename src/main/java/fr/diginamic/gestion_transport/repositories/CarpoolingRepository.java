@@ -26,4 +26,6 @@ public interface CarpoolingRepository extends JpaRepository<Carpooling, Integer>
     List<Carpooling> findAllByOrganisatorIdAndDateTimeStartBefore(Long id, LocalDateTime now);
 
     List<Carpooling> findAllByOrganisatorIdAndDateTimeStartAfter(Long id, LocalDateTime now);
+
+    List<Carpooling> findAllByDepartureAddressContainingIgnoreCaseOrArrivalAddressContainingIgnoreCaseOrDateTimeStartBetween(String departureAddress, String arrivalAddress, LocalDateTime dateTimeStart, LocalDateTime dateTimeEnd);
 }
