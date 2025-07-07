@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 @Transactional
-public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
+public interface VehicleRepository extends JpaRepository<Vehicle, String> {
     List<Vehicle> findAllByUserId(Long userId);
 }

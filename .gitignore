@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### bruno client rest ###
+*.bru

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ServiceVehicleRepository extends JpaRepository<ServiceVehicle, Integer> {
+public interface ServiceVehicleRepository extends JpaRepository<ServiceVehicle, String> {
 
     ServiceVehicle findByLicensePlateNumber(String licensePlateNumber);
 
