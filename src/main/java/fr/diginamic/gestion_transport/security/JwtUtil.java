@@ -43,6 +43,7 @@ public class JwtUtil {
 				.setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + 1000 * expireIn))
 				.signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256).compact();
+
 	}
 
 	/** Extrait le username du token

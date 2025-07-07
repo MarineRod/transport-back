@@ -25,6 +25,10 @@ public class User {
     /** permet de désactiver un utilisateur par exemple */
     private boolean enabled;
 
+    private String firstName;
+
+    private String lastName;
+
     /** Liste des rôles */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

@@ -1,5 +1,7 @@
 package fr.diginamic.gestion_transport.controllers.authentification;
 
+import fr.diginamic.gestion_transport.entites.User;
+import fr.diginamic.gestion_transport.repositories.UserRepository;
 import fr.diginamic.gestion_transport.security.CustomUserDetailsService;
 import fr.diginamic.gestion_transport.security.JwtUtil;
 import org.springframework.http.HttpStatus;
@@ -8,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,10 +38,14 @@ public class AuthController {
      */
     private final CustomUserDetailsService userDetailsService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
+    private final UserRepository userRepository;
+
+    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService userDetailsService,
+                          UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -57,7 +64,9 @@ public class AuthController {
             UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
             String jwt = jwtUtil.generateToken(userDetails);
 
-            return ResponseEntity.ok(new AuthResponse(jwt));
+            User user = this.userRepository.findByUsername(authRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("User not found: " + authRequest.getUsername()));
+
+            return ResponseEntity.ok(new AuthResponse(jwt, user));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou mot de passe incorrect");
         }
