@@ -1,11 +1,14 @@
 package fr.diginamic.gestion_transport.service;
 
 import fr.diginamic.gestion_transport.entites.ServiceVehicle;
+import fr.diginamic.gestion_transport.entites.ServiceVehicleBooking;
+import fr.diginamic.gestion_transport.repositories.ServiceVehicleBookingRepository;
 import fr.diginamic.gestion_transport.repositories.ServiceVehicleRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -16,8 +19,11 @@ public class ServiceVehicleService {
 
     private final ServiceVehicleRepository serviceVehicleRepository;
 
-    public ServiceVehicleService(ServiceVehicleRepository serviceVehicleRepository) {
+    private final ServiceVehicleBookingRepository serviceVehicleBookingRepository;
+
+    public ServiceVehicleService(ServiceVehicleRepository serviceVehicleRepository, ServiceVehicleBookingRepository serviceVehicleBookingRepository) {
         this.serviceVehicleRepository = serviceVehicleRepository;
+        this.serviceVehicleBookingRepository = serviceVehicleBookingRepository;
     }
 
     public List<ServiceVehicle> getAllVehicleService() throws Exception {
@@ -55,10 +61,13 @@ public class ServiceVehicleService {
     @Transactional(rollbackOn = Exception.class)
     public void deleteServiceVehicle(String licensePlateNumber) throws Exception {
         try {
+            List<ServiceVehicleBooking> serviceVehicleBookings  = this.serviceVehicleBookingRepository.findByServiceVehicle_LicensePlateNumber(licensePlateNumber);
+            if (!CollectionUtils.isEmpty(serviceVehicleBookings))
+                throw new Exception("Impossible de supprimer un véhicule de service lié à des réservations");
             this.serviceVehicleRepository.deleteByLicensePlateNumber(licensePlateNumber);
         } catch (Exception e) {
             LOG.error(e.getMessage());
-            throw new Exception("Impossible de supprimer le véhicule de service");
+            throw e;
         }
     }
 
