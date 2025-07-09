@@ -5,6 +5,7 @@ import fr.diginamic.gestion_transport.entites.ServiceVehicle;
 import fr.diginamic.gestion_transport.service.ServiceVehicleService;
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
 import org.modelmapper.ModelMapper;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +25,11 @@ public class ServiceVehicleController {
 	@GetMapping("")
     public List<ServiceVehicleDTO> getAll() throws Exception {
         List<ServiceVehicle> serviceVehicles = this.serviceVehicleService.getAllVehicleService();
-        return serviceVehicles.stream().map(sv -> mapper.map(sv, ServiceVehicleDTO.class)).toList();
+        return serviceVehicles.stream().map(sv -> {
+            ServiceVehicleDTO serviceVehicleDTO = mapper.map(sv, ServiceVehicleDTO.class);
+            serviceVehicleDTO.setHasBookings(!CollectionUtils.isEmpty(sv.getServiceVehicleBookings()));
+            return serviceVehicleDTO;
+        }).toList();
     }
 
     @GetMapping("/{licensePlateNumber}")

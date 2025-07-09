@@ -24,4 +24,5 @@ public class ServiceVehicleDTO {
     private Integer nbSeats;
     private BrandEnum brand;
     private VehicleStatusEnum status;
+    private Boolean hasBookings;
 }
