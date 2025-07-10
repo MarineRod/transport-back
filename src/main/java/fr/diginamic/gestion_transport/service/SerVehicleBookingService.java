@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import fr.diginamic.gestion_transport.dto.ServiceVehicleBookingDTO;
 import fr.diginamic.gestion_transport.entites.ServiceVehicleBooking;
 import fr.diginamic.gestion_transport.entites.User;
+import fr.diginamic.gestion_transport.exception.BookingConflictException;
+import fr.diginamic.gestion_transport.exception.InvalidBookingDatesException;
 import fr.diginamic.gestion_transport.repositories.ServiceVehicleBookingRepository;
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,28 +31,30 @@ public class SerVehicleBookingService {
 			UserService userService) {
 		this.serviceVehicleBookingRepository = serviceVehicleBookingRepository;
 		this.userService = userService;
-	
+
 	}
 
-	
 	private ServiceVehicleBookingDTO convertToDto(ServiceVehicleBooking booking) {
-	    modelMapper.typeMap(ServiceVehicleBooking.class, ServiceVehicleBookingDTO.class).addMappings(mapper -> {
-	        mapper.map(src -> src.getServiceVehicle().getLicensePlateNumber(), ServiceVehicleBookingDTO::setLicensePlateNumber);
-	    });
-	    return modelMapper.map(booking, ServiceVehicleBookingDTO.class);
+		modelMapper.typeMap(ServiceVehicleBooking.class, ServiceVehicleBookingDTO.class).addMappings(mapper -> {
+			mapper.map(src -> src.getServiceVehicle().getLicensePlateNumber(),
+					ServiceVehicleBookingDTO::setLicensePlateNumber);
+		});
+		return modelMapper.map(booking, ServiceVehicleBookingDTO.class);
 	}
-
 
 	private ServiceVehicleBooking convertToEntity(ServiceVehicleBookingDTO bookingDto) {
 		return modelMapper.map(bookingDto, ServiceVehicleBooking.class);
 	}
-
 
 	@Transactional(rollbackOn = Exception.class)
 	public ServiceVehicleBookingDTO createBooking(ServiceVehicleBookingDTO bookingDto) {
 		ServiceVehicleBooking booking = convertToEntity(bookingDto);
 		User connectedUser = userService.getConnectedUser();
 		booking.setUser(connectedUser);
+
+		validateBookingDates(booking);
+		checkForBookingConflict(booking, null);
+
 		ServiceVehicleBooking savedBooking = serviceVehicleBookingRepository.save(booking);
 		return convertToDto(savedBooking);
 	}
@@ -74,18 +78,21 @@ public class SerVehicleBookingService {
 	}
 
 	@Transactional(rollbackOn = Exception.class)
-	public ServiceVehicleBookingDTO updateBooking(Integer id, ServiceVehicleBookingDTO dto) throws Exception {
+	public ServiceVehicleBookingDTO updateBooking(Integer id, ServiceVehicleBookingDTO dto) {
 
 		ServiceVehicleBooking booking = serviceVehicleBookingRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Réservation non trouvée avec l'ID : " + id));
 
 		if (!booking.getId().equals(dto.getId())) {
-			throw new Exception("Impossible de modifier la réservation");
+			throw new IllegalArgumentException("Impossible de modifier la réservation");
+
 		}
 
 		booking.setDateTimeStart(dto.getDateTimeStart());
 		booking.setDateTimeEnd(dto.getDateTimeEnd());
 
+		validateBookingDates(booking);
+		checkForBookingConflict(booking, booking.getId());
 		ServiceVehicleBooking updated = serviceVehicleBookingRepository.save(booking);
 		return convertToDto(updated);
 	}
@@ -118,6 +125,34 @@ public class SerVehicleBookingService {
 
 			throw new EntityNotFoundException("Impossible de supprimer la réservation avec l'ID : " + id);
 		}
+	}
+
+	// =============================
+	// MÉTHODES PRIVÉES
+	// =============================
+
+	private void checkForBookingConflict(ServiceVehicleBooking booking, Integer excludeBookingId) {
+		String vehicleId = booking.getServiceVehicle().getLicensePlateNumber();
+		LocalDateTime start = booking.getDateTimeStart();
+		LocalDateTime end = booking.getDateTimeEnd();
+
+		boolean hasConflict = serviceVehicleBookingRepository.existsOverlappingBooking(vehicleId, start, end,
+				excludeBookingId);
+		if (hasConflict) {
+			throw new BookingConflictException(
+					"Conflit de réservation : le créneau demandé chevauche une réservation existante.");
+		}
+	}
+
+	private void validateBookingDates(ServiceVehicleBooking booking) {
+		if (booking.getDateTimeStart() == null || booking.getDateTimeEnd() == null) {
+			throw new InvalidBookingDatesException("La date de début et la date de fin doivent être renseignées.");
+		}
+
+		if (booking.getDateTimeEnd().isBefore(booking.getDateTimeStart())) {
+			throw new InvalidBookingDatesException("La date de fin ne peut pas être antérieure à la date de début.");
+		}
+
 	}
 
 }

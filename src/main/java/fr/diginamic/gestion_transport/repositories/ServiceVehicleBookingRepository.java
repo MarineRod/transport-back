@@ -41,4 +41,23 @@ public interface ServiceVehicleBookingRepository extends JpaRepository<ServiceVe
 	@Modifying
 	@Query("DELETE FROM ServiceVehicleBooking b WHERE b.id = :id AND b.user.id = :userId")
 	int deleteByIdAndUserId(@Param("id") Integer id, @Param("userId") Long userId);
+	
+	@Query("""
+		    SELECT COUNT(b) > 0 FROM ServiceVehicleBooking b
+		    WHERE b.serviceVehicle.id = :vehicleId
+		      AND (
+		            (:start BETWEEN b.dateTimeStart AND b.dateTimeEnd)
+		         OR (:end BETWEEN b.dateTimeStart AND b.dateTimeEnd)
+		         OR (b.dateTimeStart BETWEEN :start AND :end)
+		         OR (b.dateTimeEnd BETWEEN :start AND :end)
+		      )
+		      AND (:bookingId IS NULL OR b.id <> :bookingId)
+		""")
+		boolean existsOverlappingBooking(
+		    @Param("vehicleId") String vehicleId,
+		    @Param("start") LocalDateTime start,
+		    @Param("end") LocalDateTime end,
+		    @Param("bookingId") Integer bookingId
+		);
+
 }

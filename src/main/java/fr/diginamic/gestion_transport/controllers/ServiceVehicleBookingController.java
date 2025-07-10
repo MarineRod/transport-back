@@ -1,6 +1,7 @@
 package fr.diginamic.gestion_transport.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.diginamic.gestion_transport.dto.ServiceVehicleBookingDTO;
 import fr.diginamic.gestion_transport.dto.UserDTO;
 import fr.diginamic.gestion_transport.entites.User;
+import fr.diginamic.gestion_transport.exception.BookingConflictException;
 import fr.diginamic.gestion_transport.service.SerVehicleBookingService;
 import fr.diginamic.gestion_transport.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api/service-vehicle-bookings")
@@ -51,21 +54,44 @@ public class ServiceVehicleBookingController {
 	}
 
 	@PostMapping
-	public ResponseEntity<ServiceVehicleBookingDTO> createBooking(@RequestBody ServiceVehicleBookingDTO bookingDto) {
-		User user = this.userService.getConnectedUser();
-		UserDTO userDto = new UserDTO();
-		userDto.setId(user.getId());
-		userDto.setUsername(user.getUsername());
-		bookingDto.setUser(userDto);
-		ServiceVehicleBookingDTO createdBooking = bookingService.createBooking(bookingDto);
-		return new ResponseEntity<>(createdBooking, HttpStatus.CREATED);
+	public ResponseEntity<?> createBooking(@RequestBody ServiceVehicleBookingDTO bookingDto) {
+		try {
+			User user = this.userService.getConnectedUser();
+			UserDTO userDto = new UserDTO();
+			userDto.setId(user.getId());
+			userDto.setUsername(user.getUsername());
+			bookingDto.setUser(userDto);
+
+			ServiceVehicleBookingDTO createdBooking = bookingService.createBooking(bookingDto);
+			return ResponseEntity
+				    .status(HttpStatus.CREATED)
+				    .body(Map.of(
+				        "message", "Réservation créée avec succès",
+				        "data", createdBooking
+				    ));
+
+		} catch (BookingConflictException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+		}
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<ServiceVehicleBookingDTO> updateBooking(@PathVariable Integer id,
-			@RequestBody ServiceVehicleBookingDTO bookingDto) throws Exception {
-		ServiceVehicleBookingDTO updatedBooking = bookingService.updateBooking(id, bookingDto);
-		return new ResponseEntity<>(updatedBooking, HttpStatus.OK);
+	public ResponseEntity<?> updateBooking(@PathVariable Integer id, @RequestBody ServiceVehicleBookingDTO bookingDto) {
+
+		try {
+			bookingDto.setId(id); 
+			ServiceVehicleBookingDTO updatedBooking = bookingService.updateBooking(id, bookingDto);
+			return ResponseEntity.ok(Map.of(
+		            "message", "Réservation mise à jour avec succès",
+		            "data", updatedBooking
+		        ));
+
+		} catch (BookingConflictException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+
+		} catch (EntityNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+		}
 	}
 
 	@GetMapping("user-booking")
@@ -73,7 +99,6 @@ public class ServiceVehicleBookingController {
 			throws Exception {
 		List<ServiceVehicleBookingDTO> bookings = bookingService.getUserBookings(isArchived);
 		return new ResponseEntity<>(bookings, HttpStatus.OK);
-
 	}
 
 	@DeleteMapping("/{id}")
