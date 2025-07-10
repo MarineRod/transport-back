@@ -48,4 +48,13 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Vehicle> vehicles;
+
+    public User(Long id, String username, String password, boolean enabled, String firstName, String lastName) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }
