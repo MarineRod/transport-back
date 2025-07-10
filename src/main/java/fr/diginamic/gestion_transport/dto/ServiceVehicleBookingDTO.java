@@ -2,14 +2,15 @@ package fr.diginamic.gestion_transport.dto;
 
 import java.time.LocalDateTime;
 
-import fr.diginamic.gestion_transport.entites.ServiceVehicle;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceVehicleBookingDTO {
