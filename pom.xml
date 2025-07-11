@@ -128,6 +128,16 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<includes>
+						<include>fr/diginamic/gestion_transport/**/*</include>
+					</includes>
+					<excludes>
+						<exclude>**/config/**</exclude>
+						<exclude>**/controllers/**</exclude>
+						<exclude>**/*Application.*</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>

@@ -7,7 +7,6 @@ import fr.diginamic.gestion_transport.repositories.ServiceVehicleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,14 +28,14 @@ class ServiceVehicleServiceTest {
     @Mock
     private ServiceVehicleBookingRepository serviceVehicleBookingRepository;
 
-    @InjectMocks
-    private ServiceVehicleService serviceVehicleService;
 
+    private ServiceVehicleService serviceVehicleService;
     private ServiceVehicle serviceVehicle;
     private ServiceVehicleBooking serviceVehicleBooking;
 
     @BeforeEach
     void setUp() {
+        serviceVehicleService = new ServiceVehicleService(serviceVehicleRepository, serviceVehicleBookingRepository);
         serviceVehicle = new ServiceVehicle();
         serviceVehicle.setLicensePlateNumber("AB123CD");
 

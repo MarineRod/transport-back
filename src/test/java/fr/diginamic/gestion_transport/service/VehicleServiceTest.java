@@ -26,7 +26,6 @@ class VehicleServiceTest {
     @Mock
     private VehicleRepository vehicleRepository;
 
-    @Mock
     private VehicleService vehicleService;
 
     private ModelMapper mapper;
@@ -44,10 +43,6 @@ class VehicleServiceTest {
     }
 
     @Test
-    void save_Success() {
-    }
-
-    @Test
     void getAllVehicles_ShouldReturnVehicleList() throws Exception {
         when(vehicleRepository.findAllByUserId(userId)).thenReturn(vehicles);
         List<Vehicle> result = vehicleService.getAllVehicles(userId);
@@ -58,8 +53,8 @@ class VehicleServiceTest {
     }
 
     @Test
-    void getAllVehicles_ShouldThrowException() throws Exception {
-        when(vehicleRepository.findAllByUserId(2L)).thenThrow(new RuntimeException("DB down"));
+    void getAllVehicles_ShouldThrowException() {
+        when(vehicleRepository.findAllByUserId(userId)).thenThrow(new RuntimeException("DB down"));
 
         Exception exception = assertThrows(Exception.class, () -> vehicleService.getAllVehicles(userId));
         assertEquals("Impossible de récupérer les véhicules", exception.getMessage());

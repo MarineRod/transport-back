@@ -31,7 +31,6 @@ class UserServiceTest {
     @Mock
     private Authentication authentication;
 
-    @Mock
     private UserService userService;
 
     private User testUser;
