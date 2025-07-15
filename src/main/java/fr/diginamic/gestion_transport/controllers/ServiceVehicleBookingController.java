@@ -27,6 +27,7 @@ import jakarta.persistence.EntityNotFoundException;
 @RequestMapping("/api/service-vehicle-bookings")
 public class ServiceVehicleBookingController {
 
+	private static final String MESSAGE_KEY = "message";
 	private final UserService userService;
 	private final SerVehicleBookingService bookingService;
 
@@ -54,7 +55,7 @@ public class ServiceVehicleBookingController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> createBooking(@RequestBody ServiceVehicleBookingDTO bookingDto) {
+	public ResponseEntity<Map<String, Object>> createBooking(@RequestBody ServiceVehicleBookingDTO bookingDto) {
 		try {
 			User user = this.userService.getConnectedUser();
 			UserDTO userDto = new UserDTO();
@@ -63,12 +64,8 @@ public class ServiceVehicleBookingController {
 			bookingDto.setUser(userDto);
 
 			ServiceVehicleBookingDTO createdBooking = bookingService.createBooking(bookingDto);
-			return ResponseEntity
-				    .status(HttpStatus.CREATED)
-				    .body(Map.of(
-				        "message", "Réservation créée avec succès",
-				        "data", createdBooking
-				    ));
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.body(Map.of(MESSAGE_KEY, "Réservation créée avec succès", "data", createdBooking));
 
 		} catch (BookingConflictException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
@@ -76,15 +73,13 @@ public class ServiceVehicleBookingController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateBooking(@PathVariable Integer id, @RequestBody ServiceVehicleBookingDTO bookingDto) {
+	public ResponseEntity<Map<String, Object>> updateBooking(@PathVariable Integer id,
+			@RequestBody ServiceVehicleBookingDTO bookingDto) {
 
 		try {
-			bookingDto.setId(id); 
+			bookingDto.setId(id);
 			ServiceVehicleBookingDTO updatedBooking = bookingService.updateBooking(id, bookingDto);
-			return ResponseEntity.ok(Map.of(
-		            "message", "Réservation mise à jour avec succès",
-		            "data", updatedBooking
-		        ));
+			return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Réservation mise à jour avec succès", "data", updatedBooking));
 
 		} catch (BookingConflictException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));

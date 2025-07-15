@@ -81,7 +81,7 @@ public class CarpoolingController {
     }
 
     @DeleteMapping("{idCarpooling}/user-booking")
-    public ResponseEntity<?> cancelUserBooking(
+    public ResponseEntity<Map<String, String>> cancelUserBooking(
             @PathVariable Integer idCarpooling
     ) {
         this.carpoolingService.cancelUserBooking(idCarpooling);
@@ -93,7 +93,7 @@ public class CarpoolingController {
     }
 
     @PostMapping("{idCarpooling}/user-booking")
-    public ResponseEntity<?> saveUserBooking(
+    public ResponseEntity<Map<String, String>> saveUserBooking(
             @PathVariable Integer idCarpooling
     ) {
         this.carpoolingService.saveUserBooking(idCarpooling);

@@ -21,7 +21,6 @@ public class EmailService {
     private String USERNAME;
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
-    private final Logger LOG = LoggerFactory.getLogger(EmailService.class);
 
     public EmailService(JavaMailSender javaMailSender, SpringTemplateEngine templateEngine) {
         this.javaMailSender = javaMailSender;
@@ -29,7 +28,7 @@ public class EmailService {
     }
 
     public void sendHtmlMail(MailSendingSettingsDTO mailSendingSettings) throws Exception {
-        try {
+   
             MimeMessage message = javaMailSender.createMimeMessage();
             Context context = new Context();
             if (mailSendingSettings.getContextData() != null)
@@ -43,16 +42,12 @@ public class EmailService {
             helper.setSubject(mailSendingSettings.getSubject());
             helper.setText(process, true);
             javaMailSender.send(message);
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception(e.getMessage());
-
-        }
+        
 
     }
 
     public void sendTextMail(String to) throws Exception {
-        try {
+    
             MimeMessage message = javaMailSender.createMimeMessage();
             Context context = new Context();
             context.setVariable("username", USERNAME);
@@ -63,9 +58,7 @@ public class EmailService {
             helper.setTo(to);
             helper.setText(process);
             javaMailSender.send(message);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+       
     }
 
 
