@@ -1,14 +1,15 @@
 package fr.diginamic.gestion_transport.security;
 
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Fournit des services de génération de token JWT et de vérification
@@ -27,13 +28,22 @@ public class JwtUtil {
 	/**
 	 * Génère un token JWT Contenant
 	 * 
-	 * @param username nom de l'utilisateur
+	 * @param userDetails nom de l'utilisateur
 	 * @return String
 	 */
-	public String generateToken(String username) {
-		return Jwts.builder().setSubject(username).setIssuedAt(new Date())
+	public String generateToken(UserDetails userDetails) {
+
+		List<String> roles = userDetails.getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
+				.toList();
+
+		return Jwts.builder().
+				setSubject(userDetails.getUsername())
+				.claim("roles", roles)
+				.setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + 1000 * expireIn))
 				.signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256).compact();
+
 	}
 
 	/** Extrait le username du token

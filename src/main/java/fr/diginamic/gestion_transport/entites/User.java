@@ -25,6 +25,10 @@ public class User {
     /** permet de désactiver un utilisateur par exemple */
     private boolean enabled;
 
+    private String firstName;
+
+    private String lastName;
+
     /** Liste des rôles */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
@@ -41,4 +45,16 @@ public class User {
 
 	@OneToMany(mappedBy="user")
 	private Set<ServiceVehicleBooking> serviceVehicleBooking;
+
+    @OneToMany(mappedBy = "user")
+    private List<Vehicle> vehicles;
+
+    public User(Long id, String username, String password, boolean enabled, String firstName, String lastName) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }

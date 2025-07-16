@@ -1,15 +1,22 @@
 package fr.diginamic.gestion_transport.tools;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+
+
 /**
- * Petit utilitaire qui sert simplement à encrypter une chaine de caractères
+ * Utilitaire qui sert simplement à encrypter une chaine de caractères
  */
 public class BCryptEncodeMain {
 
-	public static void main(String[] args) {
+	private static final Logger logger = LoggerFactory.getLogger(BCryptEncodeMain.class);
+
+	public static void encode(String strToEncode) {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		System.out.println(encoder.encode("a"));
+		String encodedPassword = encoder.encode(strToEncode);
+		logger.info("Encoded password: {}", encodedPassword);
 
 	}
 

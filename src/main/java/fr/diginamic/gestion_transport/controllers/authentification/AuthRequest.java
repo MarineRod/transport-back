@@ -1,4 +1,4 @@
-package fr.diginamic.gestion_transport.controllers;
+package fr.diginamic.gestion_transport.controllers.authentification;
 
 /**
  * Objet transmis dans le body de la requête HTTP lors de l'authentification

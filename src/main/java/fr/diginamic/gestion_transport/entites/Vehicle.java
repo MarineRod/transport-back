@@ -2,7 +2,10 @@ package fr.diginamic.gestion_transport.entites;
 
 import fr.diginamic.gestion_transport.enums.BrandEnum;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -24,7 +27,14 @@ public class Vehicle {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private BrandEnum Brand;
-
 	@OneToMany(mappedBy = "vehicle")
 	private List<Carpooling> carpoolings;
+
+	@ManyToOne
+	@JoinColumn(name = "USER_ID")
+	private User user;
+
+    public String getBrandModel(){
+        return Brand.name().toUpperCase() + " " + model;
+    }
 }

@@ -1,6 +1,5 @@
 package fr.diginamic.gestion_transport.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
 /**
  * Configure la sécurité
@@ -21,14 +21,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
-	
-	/** Filtre HTTP */
-	@Autowired
-	private JwtAuthenticationFilter jwtFilter;
 
-	/** Met en place la sécurité
+	private final JwtAuthenticationFilter jwtFilter;
+
+	public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+		this.jwtFilter = jwtFilter;
+	}
+
+	/**
+	 * Met en place la sécurité
+	 * 
 	 * @param http http security
-	 * @return SecurityFilterChain 
+	 * @return SecurityFilterChain
 	 * @throws Exception en cas de problème
 	 */
 	@Bean
@@ -36,7 +40,8 @@ public class SecurityConfig {
 	    http.csrf(AbstractHttpConfigurer::disable) // Désactiver CSRF
 	        .authorizeHttpRequests(authorize -> authorize
 	            .requestMatchers("/api/auth/**").permitAll() // Autoriser /api/auth sans authentification
-	            .anyRequest().authenticated() // Tous les autres endpoints sont authentifiés
+					.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+					.anyRequest().authenticated() // Tous les autres endpoints sont authentifiés
 	        );
 	    http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 	    return http.build();

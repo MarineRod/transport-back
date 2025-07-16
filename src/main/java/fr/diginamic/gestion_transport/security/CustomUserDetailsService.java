@@ -1,28 +1,30 @@
 package fr.diginamic.gestion_transport.security;
 
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import fr.diginamic.gestion_transport.entites.User;
+import fr.diginamic.gestion_transport.repositories.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import fr.diginamic.gestion_transport.entites.User;
-import fr.diginamic.gestion_transport.repositories.UserRepository;
+import java.util.stream.Collectors;
 
 /**
- * Utilisée par AuthController pour authentifier l'utilisateur en 2 temps:
- * - il est appelé une 1ère fois indirectement par AuthenticationManager pour vérifier le user/password
- * - il est appelé une 2nds fois de manière directe pour récupérer le détail.
+ * Utilisée par AuthController pour authentifier l'utilisateur en 2 temps: - il
+ * est appelé une 1ère fois indirectement par AuthenticationManager pour
+ * vérifier le user/password - il est appelé une 2nds fois de manière directe
+ * pour récupérer le détail.
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    /** Pour l'accès en base de données */
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
