@@ -2,8 +2,6 @@ package fr.diginamic.gestion_transport.controllers.authentification;
 
 import fr.diginamic.gestion_transport.entites.User;
 
-import java.util.Optional;
-
 /**
  * Sert à retourner le token JWT dans le body de la réponse
  */

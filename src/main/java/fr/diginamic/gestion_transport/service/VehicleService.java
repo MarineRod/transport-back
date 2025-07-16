@@ -2,6 +2,8 @@ package fr.diginamic.gestion_transport.service;
 
 import fr.diginamic.gestion_transport.dto.VehicleDTO;
 import fr.diginamic.gestion_transport.entites.Vehicle;
+import fr.diginamic.gestion_transport.exception.VehicleGetListException;
+import fr.diginamic.gestion_transport.exception.VehicleSaveException;
 import fr.diginamic.gestion_transport.repositories.VehicleRepository;
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
 import jakarta.transaction.Transactional;
@@ -15,7 +17,7 @@ import java.util.List;
 @Service
 public class VehicleService {
 
-    private final Logger LOG = LoggerFactory.getLogger(VehicleService.class);
+    private final Logger logger = LoggerFactory.getLogger(VehicleService.class);
     private final ModelMapper mapper = ModelMapperCfg.getInstance();
     private final VehicleRepository vehicleRepository;
 
@@ -24,33 +26,22 @@ public class VehicleService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public Vehicle save(Vehicle vehicleToSave) throws Exception {
+    public Vehicle save(VehicleDTO vehicleToSave) throws VehicleSaveException {
         try {
             Vehicle vehicle = mapper.map(vehicleToSave, Vehicle.class);
             return this.vehicleRepository.save(vehicle);
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible de sauvegarder le véhicule");
+            logger.error(e.getMessage());
+            throw new VehicleSaveException("Impossible de sauvegarder le véhicule");
         }
     }
 
-    @Transactional(rollbackOn = Exception.class)
-    public Vehicle save(VehicleDTO vehicleToSave) throws Exception {
-        try {
-            Vehicle vehicle = mapper.map(vehicleToSave, Vehicle.class);
-            return this.vehicleRepository.save(vehicle);
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible de sauvegarder le véhicule");
-        }
-    }
-
-    public List<Vehicle> getAllVehicles(Long userId) throws Exception {
+    public List<Vehicle> getAllVehicles(Long userId) throws VehicleGetListException {
         try {
             return this.vehicleRepository.findAllByUserId(userId);
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible de récupérer les véhicules");
+            logger.error(e.getMessage());
+            throw new VehicleGetListException("Impossible de récupérer les véhicules");
         }
     }
 }

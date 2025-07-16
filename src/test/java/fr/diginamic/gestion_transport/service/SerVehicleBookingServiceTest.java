@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -331,6 +330,9 @@ class SerVehicleBookingServiceTest {
 		when(serviceVehicleBookingRepositoryMock.deleteByIdAndUserId(idBooking, userId)).thenReturn(1);
 
 		testedObject.deleteBooking(idBooking, userId);
+
+		verify(serviceVehicleBookingRepositoryMock, times(1))
+				.deleteByIdAndUserId(idBooking, userId);
 	}
 
 	@Test

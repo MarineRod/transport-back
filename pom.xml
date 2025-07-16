@@ -11,10 +11,10 @@
 	</parent>
 	<groupId>Projet-CDA-Groupe-2-Gestion-transport</groupId>
 	<artifactId>gestion-transport-back</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-PRE_RELEASE</version>
 	<name>Gestion transport</name>
-	<description>Demo project for Spring Boot</description>
-	<url />
+	<description>Application permettant aux collaborateurs de l'entreprise X de réserver des covoiturages et des véhicules de service.</description>
+	<url>https://github.com/Projet-CDA-Groupe-2-Gestion-transport</url>
 	<licenses>
 		<license />
 	</licenses>
@@ -134,6 +134,8 @@
 					</includes>
 					<excludes>
 						<exclude>**/config/**</exclude>
+						<exclude>**/entites/**</exclude>
+						<exclude>**/tools/**</exclude>
 						<exclude>**/controllers/**</exclude>
 						<exclude>**/*Application.*</exclude>
 					</excludes>

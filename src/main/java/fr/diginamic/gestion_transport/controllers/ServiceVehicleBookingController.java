@@ -68,7 +68,7 @@ public class ServiceVehicleBookingController {
 					.body(Map.of(MESSAGE_KEY, "Réservation créée avec succès", "data", createdBooking));
 
 		} catch (BookingConflictException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(MESSAGE_KEY, e.getMessage()));
 		}
 	}
 
@@ -82,10 +82,10 @@ public class ServiceVehicleBookingController {
 			return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Réservation mise à jour avec succès", "data", updatedBooking));
 
 		} catch (BookingConflictException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(MESSAGE_KEY, e.getMessage()));
 
 		} catch (EntityNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(MESSAGE_KEY, e.getMessage()));
 		}
 	}
 

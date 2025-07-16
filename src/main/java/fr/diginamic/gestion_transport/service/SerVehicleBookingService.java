@@ -23,7 +23,7 @@ import jakarta.transaction.Transactional;
 public class SerVehicleBookingService {
 
 	private final ModelMapper modelMapper = ModelMapperCfg.getInstance();
-	private final Logger LOG = LoggerFactory.getLogger(SerVehicleBookingService.class);
+	private final Logger logger = LoggerFactory.getLogger(SerVehicleBookingService.class);
 	private final ServiceVehicleBookingRepository serviceVehicleBookingRepository;
 	private final UserService userService;
 
@@ -101,7 +101,6 @@ public class SerVehicleBookingService {
 	public List<ServiceVehicleBookingDTO> getUserBookings(Boolean isArchived) throws Exception {
 		try {
 			Long id = userService.getConnectedUser().getId();
-			System.out.println("ID utilisateur connecté : " + id);
 			List<ServiceVehicleBooking> bookings;
 
 			if (Boolean.FALSE.equals(isArchived)) {
@@ -109,11 +108,10 @@ public class SerVehicleBookingService {
 			} else {
 				bookings = serviceVehicleBookingRepository.findPastBookingsFullyEnded(id, LocalDateTime.now());
 			}
-			System.out.println("Nombre de réservations récupérées : " + bookings.size());
-			return bookings.stream().map(this::convertToDto).collect(Collectors.toList());
+			return bookings.stream().map(this::convertToDto).toList();
 
 		} catch (Exception e) {
-			LOG.error("Erreur lors de la récupération des réservations : {}", e.getMessage());
+			logger.error("Erreur lors de la récupération des réservations : {}", e.getMessage());
 			throw new Exception("Impossible de récupérer la liste des réservations de véhicules de service", e);
 		}
 	}

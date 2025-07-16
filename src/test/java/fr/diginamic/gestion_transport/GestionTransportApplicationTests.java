@@ -8,6 +8,7 @@ class GestionTransportApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// Empty
 	}
 
 }

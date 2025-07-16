@@ -96,7 +96,7 @@ class CarpoolingServiceTest {
 	}
 
 	@Test
-	void testSaveCarpooling_whenVehicleIsNull_thenThrowException() throws Exception {
+	void testSaveCarpooling_whenVehicleIsNull_thenThrowException() {
 
 		CarpoolingDTO dto = new CarpoolingDTO();
 		dto.setVehicle(null);

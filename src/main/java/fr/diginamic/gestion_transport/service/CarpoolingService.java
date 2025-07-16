@@ -5,6 +5,9 @@ import fr.diginamic.gestion_transport.dto.MailSendingSettingsDTO;
 import fr.diginamic.gestion_transport.entites.Carpooling;
 import fr.diginamic.gestion_transport.entites.User;
 import fr.diginamic.gestion_transport.enums.MailTemplateEnum;
+import fr.diginamic.gestion_transport.exception.ImpossibleDeleteException;
+import fr.diginamic.gestion_transport.exception.ImpossibleUpdateException;
+import fr.diginamic.gestion_transport.exception.SearchCriteriaException;
 import fr.diginamic.gestion_transport.repositories.CarpoolingRepository;
 import fr.diginamic.gestion_transport.repositories.UserRepository;
 import fr.diginamic.gestion_transport.tools.ModelMapperCfg;
@@ -25,8 +28,10 @@ import java.util.*;
 @Service
 public class CarpoolingService {
 
-    private final Logger LOG = LoggerFactory.getLogger(CarpoolingService.class);
+    private final Logger logger = LoggerFactory.getLogger(CarpoolingService.class);
     private final ModelMapper mapper = ModelMapperCfg.getInstance();
+
+    public static final String CARPOOLING_NOT_FOUND = "Ce covoiturage n'existe pas";
 
     private final CarpoolingRepository carpoolingRepository;
     private final UserService userService;
@@ -41,21 +46,21 @@ public class CarpoolingService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public Carpooling saveCarpooling(CarpoolingDTO carpooling) throws Exception {
+    public Carpooling saveCarpooling(CarpoolingDTO carpooling) throws ImpossibleUpdateException {
         try {
             List<String> errors = isInError(carpooling);
-            if (!CollectionUtils.isEmpty(errors)) throw new Exception(String.join(", ", errors));
+            if (!CollectionUtils.isEmpty(errors)) throw new ImpossibleUpdateException(String.join(", ", errors));
             if (carpooling.getId() != null) {
                 Carpooling oldCarpooling = this.carpoolingRepository.findById(carpooling.getId()).orElse(null);
                 if (oldCarpooling != null && !CollectionUtils.isEmpty(oldCarpooling.getUsers())) {
-                    throw new Exception("Impossible de modifier l'annonce de covoiturage");
+                    throw new ImpossibleUpdateException("Impossible de modifier l'annonce de covoiturage");
                 }
             }
             Carpooling entity = mapper.map(carpooling, Carpooling.class);
             return this.carpoolingRepository.save(entity);
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible d'enregistrer l'annonce de covoiturage");
+            logger.error(e.getMessage());
+            throw new ImpossibleUpdateException("Impossible d'enregistrer l'annonce de covoiturage");
         }
     }
 
@@ -74,10 +79,10 @@ public class CarpoolingService {
     @Transactional(rollbackOn = Exception.class)
     public void deleteCarpooling(Integer id, Long userId) throws Exception {
         try {
-            Carpooling carpooling = this.carpoolingRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ce covoiturage n'existe pas"));
+            Carpooling carpooling = this.carpoolingRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(CARPOOLING_NOT_FOUND));
             int result = this.carpoolingRepository.deleteByIdAndUserId(id, userId);
             if (result == 0)
-                throw new Exception("Impossible de supprimer l'annonce de covoiturage");
+                throw new ImpossibleDeleteException("Impossible de supprimer l'annonce de covoiturage");
             Map<String, String> context = prepareContext(carpooling);
 
             for (User user : carpooling.getUsers()) {
@@ -90,8 +95,8 @@ public class CarpoolingService {
                 this.emailService.sendHtmlMail(settings);
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible de supprimer l'annonce de covoiturage");
+            logger.error(e.getMessage());
+            throw new ImpossibleDeleteException("Impossible de supprimer l'annonce de covoiturage");
         }
     }
 
@@ -102,31 +107,31 @@ public class CarpoolingService {
         return context;
     }
 
-    public Carpooling getCarpooling(Integer id) throws Exception {
+    public Carpooling getCarpooling(Integer id) throws EntityNotFoundException {
         try {
             Carpooling carpooling = this.carpoolingRepository.findById(id).orElse(null);
             if (carpooling == null)
-                throw new Exception("Impossible de trouver l'annonce de covoiturage");
+                throw new EntityNotFoundException("Impossible de trouver l'annonce de covoiturage");
             return carpooling;
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible de trouver l'annonce de covoiturage");
+            logger.error(e.getMessage());
+            throw new EntityNotFoundException("Impossible de trouver l'annonce de covoiturage");
         }
     }
 
-    public Set<User> getCarpoolingParticipantList(Integer id) throws Exception {
+    public Set<User> getCarpoolingParticipantList(Integer id) throws EntityNotFoundException {
         try {
             Carpooling carpooling = this.carpoolingRepository.findById(id).orElse(null);
             if (carpooling == null)
-                throw new Exception("Impossible de trouver ce covoiturage");
+                throw new EntityNotFoundException("Impossible de trouver ce covoiturage");
             return carpooling.getUsers();
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible de trouver ce covoiturage");
+            logger.error(e.getMessage());
+            throw new EntityNotFoundException("Impossible de trouver ce covoiturage");
         }
     }
 
-    public List<Carpooling> getUserBookings(Boolean isArchived) throws Exception {
+    public List<Carpooling> getUserBookings(Boolean isArchived) throws EntityNotFoundException {
 
         User connectedUser = userService.getConnectedUser();
         try {
@@ -136,8 +141,8 @@ public class CarpoolingService {
                 return this.carpoolingRepository.findCarpoolingByUsersContainsAndDateTimeStartBefore(connectedUser, LocalDateTime.now());
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible de récupérer la liste des réservations de covoiturage");
+            logger.error(e.getMessage());
+            throw new EntityNotFoundException("Impossible de récupérer la liste des réservations de covoiturage");
         }
     }
 
@@ -150,7 +155,7 @@ public class CarpoolingService {
     @Transactional
     public void cancelUserBooking(Integer idCarpooling) {
         User user = userService.getConnectedUser();
-        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException("Ce covoiturage n'existe pas"));
+        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException(CARPOOLING_NOT_FOUND));
 
         carpooling.getUsers().remove(user);
         user.getCarpoolings().remove(carpooling);
@@ -163,7 +168,7 @@ public class CarpoolingService {
     @Transactional
     public void saveUserBooking(Integer idCarpooling) {
         User user = userService.getConnectedUser();
-        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException("Ce covoiturage n'existe pas"));
+        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException(CARPOOLING_NOT_FOUND));
 
         carpooling.getUsers().add(user);
         user.getCarpoolings().add(carpooling);
@@ -173,7 +178,7 @@ public class CarpoolingService {
         this.userRepository.save(user);
     }
 
-    public List<Carpooling> getAllOrganisatorCarpooling(boolean isArchived) throws Exception {
+    public List<Carpooling> getAllOrganisatorCarpooling(boolean isArchived) throws EntityNotFoundException {
         try {
             User user = userService.getConnectedUser();
             if (isArchived)
@@ -181,18 +186,18 @@ public class CarpoolingService {
             else
                 return this.carpoolingRepository.findAllByOrganisatorIdAndDateTimeStartAfter(user.getId(), LocalDateTime.now());
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            throw new Exception("Impossible de récupérer la liste de mes covoiturages");
+            logger.error(e.getMessage());
+            throw new EntityNotFoundException("Impossible de récupérer la liste de mes covoiturages");
         }
     }
 
-    public List<Carpooling> search(String departureAddress, String arrivalAddress, LocalDate dateTimeStart) throws Exception {
+    public List<Carpooling> search(String departureAddress, String arrivalAddress, LocalDate dateTimeStart) throws SearchCriteriaException {
         int nbCriteria = 0;
         if (departureAddress != null) nbCriteria++;
         if (arrivalAddress != null) nbCriteria++;
         if (dateTimeStart != null) nbCriteria++;
         if (nbCriteria < 1){
-            throw new Exception("Veuillez saisir au moins un critère de recherche");
+            throw new SearchCriteriaException("Veuillez saisir au moins un critère de recherche");
         }
         LocalDateTime start = null;
         LocalDateTime end = null;
@@ -205,7 +210,7 @@ public class CarpoolingService {
 
     public Boolean hasUserBooked(Integer idCarpooling){
         User user = userService.getConnectedUser();
-        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException("Ce covoiturage n'existe pas"));
+        Carpooling carpooling = this.carpoolingRepository.findById(idCarpooling).orElseThrow(() -> new EntityNotFoundException(CARPOOLING_NOT_FOUND));
 
         return carpooling.getUsers().contains(user);
     }
