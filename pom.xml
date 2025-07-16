@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>Projet-CDA-Groupe-2-Gestion-transport</groupId>
 	<artifactId>gestion-transport-back</artifactId>
-	<version>1.0.0-PRE_RELEASE</version>
+	<version>1.0.0</version>
 	<name>Gestion transport</name>
 	<description>Application permettant aux collaborateurs de l'entreprise X de réserver des covoiturages et des véhicules de service.</description>
 	<url>https://github.com/Projet-CDA-Groupe-2-Gestion-transport</url>

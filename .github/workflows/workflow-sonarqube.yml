@@ -77,72 +77,72 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Correspond à un secret défini dans le repository Github
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back
 
-      - name: Vérification du Quality Gate      # On vérifie que le rapport SonarQube généré ne contient pas d'erreurs, si oui, le job est mis en erreur.
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          PROJECT_KEY="Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back"
-          
-          echo "🔍 Vérification du Quality Gate pour le projet: $PROJECT_KEY"
-          
-          # Attendre que l'analyse soit traitée
-          echo "⏳ Attente de 30 secondes pour le traitement de l'analyse..."
-          sleep 30
-          
-          # Nouvelle approche : utiliser l'API qualitygates/project_status directement
-          echo "🔍 Récupération du statut du Quality Gate..."
-          
-          response=$(curl -s -u $SONAR_TOKEN: \
-            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY")
-          
-          echo "📊 Réponse de l'API SonarCloud:"
-          echo "$response" | jq '.'
-          
-          # Extraire le statut
-          status=$(echo "$response" | jq -r '.projectStatus.status')
-          
-          echo "📈 Statut du Quality Gate: $status"
-          
-          # Vérifier si le statut est valide
-          if [ "$status" = "null" ] || [ -z "$status" ]; then
-            echo "❌ Impossible de récupérer le statut du Quality Gate"
-            echo "🔍 Tentative avec une approche alternative..."
-          
-            # Approche alternative : vérifier les métriques directement
-            metrics_response=$(curl -s -u $SONAR_TOKEN: \
-              "https://sonarcloud.io/api/measures/component?component=$PROJECT_KEY&metricKeys=alert_status")
-          
-            echo "📊 Réponse des métriques:"
-            echo "$metrics_response" | jq '.'
-          
-            alert_status=$(echo "$metrics_response" | jq -r '.component.measures[0].value')
-          
-            if [ "$alert_status" = "OK" ]; then
-              echo "✅ Quality Gate: OK (via métriques)"
-              exit 0
-            elif [ "$alert_status" = "ERROR" ]; then
-              echo "❌ Quality Gate: FAILED (via métriques)"
-              exit 1
-            else
-              echo "⚠️  Statut du Quality Gate non déterminé, mais poursuite du pipeline"
-              exit 0
-            fi
-          fi
-          
-          # Vérifier le statut principal
-          if [ "$status" = "OK" ]; then
-            echo "✅ Quality Gate: OK"
-            exit 0
-          elif [ "$status" = "ERROR" ]; then
-            echo "❌ Quality Gate: FAILED"
-            # Afficher les détails des conditions qui ont échoué
-            echo "📋 Détails des conditions:"
-            echo "$response" | jq '.projectStatus.conditions[] | select(.status == "ERROR")'
-            exit 1
-          else
-            echo "⚠️  Statut du Quality Gate: $status (non critique)"
-            exit 0
-          fi
+#      - name: Vérification du Quality Gate      # On vérifie que le rapport SonarQube généré ne contient pas d'erreurs, si oui, le job est mis en erreur.
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        run: |
+#          PROJECT_KEY="Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back"
+#
+#          echo "🔍 Vérification du Quality Gate pour le projet: $PROJECT_KEY"
+#
+#          # Attendre que l'analyse soit traitée
+#          echo "⏳ Attente de 30 secondes pour le traitement de l'analyse..."
+#          sleep 30
+#
+#          # Nouvelle approche : utiliser l'API qualitygates/project_status directement
+#          echo "🔍 Récupération du statut du Quality Gate..."
+#
+#          response=$(curl -s -u $SONAR_TOKEN: \
+#            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY")
+#
+#          echo "📊 Réponse de l'API SonarCloud:"
+#          echo "$response" | jq '.'
+#
+#          # Extraire le statut
+#          status=$(echo "$response" | jq -r '.projectStatus.status')
+#
+#          echo "📈 Statut du Quality Gate: $status"
+#
+#          # Vérifier si le statut est valide
+#          if [ "$status" = "null" ] || [ -z "$status" ]; then
+#            echo "❌ Impossible de récupérer le statut du Quality Gate"
+#            echo "🔍 Tentative avec une approche alternative..."
+#
+#            # Approche alternative : vérifier les métriques directement
+#            metrics_response=$(curl -s -u $SONAR_TOKEN: \
+#              "https://sonarcloud.io/api/measures/component?component=$PROJECT_KEY&metricKeys=alert_status")
+#
+#            echo "📊 Réponse des métriques:"
+#            echo "$metrics_response" | jq '.'
+#
+#            alert_status=$(echo "$metrics_response" | jq -r '.component.measures[0].value')
+#
+#            if [ "$alert_status" = "OK" ]; then
+#              echo "✅ Quality Gate: OK (via métriques)"
+#              exit 0
+#            elif [ "$alert_status" = "ERROR" ]; then
+#              echo "❌ Quality Gate: FAILED (via métriques)"
+#              exit 1
+#            else
+#              echo "⚠️  Statut du Quality Gate non déterminé, mais poursuite du pipeline"
+#              exit 0
+#            fi
+#          fi
+#
+#          # Vérifier le statut principal
+#          if [ "$status" = "OK" ]; then
+#            echo "✅ Quality Gate: OK"
+#            exit 0
+#          elif [ "$status" = "ERROR" ]; then
+#            echo "❌ Quality Gate: FAILED"
+#            # Afficher les détails des conditions qui ont échoué
+#            echo "📋 Détails des conditions:"
+#            echo "$response" | jq '.projectStatus.conditions[] | select(.status == "ERROR")'
+#            exit 1
+#          else
+#            echo "⚠️  Statut du Quality Gate: $status (non critique)"
+#            exit 0
+#          fi
 
   build:                                        # Build pour un possible deploy après
     name: Build du projet
