@@ -14,6 +14,8 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("https://gestion-transport-front-qymw.vercel.app")
+                        .allowedOrigins("https://gestion-transport-front-qymw-gs68sr0nt-gestion-transport.vercel.app")
+                        .allowedOrigins("http://localhost:4200")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
