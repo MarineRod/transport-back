@@ -1,4 +1,4 @@
-name: CI/CD Back - Gestion des transports
+name: CI/CD Back - transport-back
 # Executé seulement lors des merge sur main, permet d'obtenir un rapport SonarCube
 on:
   push:
@@ -75,13 +75,13 @@ jobs:
       - name: Analyse SonarCloud                # Analyse SonarQube via SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Correspond à un secret défini dans le repository Github
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=transport-back
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MarineRod_transport-back
 
 #      - name: Vérification du Quality Gate      # On vérifie que le rapport SonarQube généré ne contient pas d'erreurs, si oui, le job est mis en erreur.
 #        env:
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 #        run: |
-#          PROJECT_KEY="transport-back"
+#          PROJECT_KEY="MarineRod_transport-back"
 #
 #          echo "🔍 Vérification du Quality Gate pour le projet: $PROJECT_KEY"
 #
