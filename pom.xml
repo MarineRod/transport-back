@@ -30,9 +30,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<sonar.projectKey>Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back</sonar.projectKey>
-		<sonar.projectName>gestion-transport-back</sonar.projectName>
-		<sonar.organization>projetcdagroupe2gestiontransport</sonar.organization>
+		<sonar.projectName>transport-back</sonar.projectName>
 	</properties>
 	<dependencies>
 		<dependency>
