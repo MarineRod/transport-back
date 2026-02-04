@@ -68,11 +68,8 @@ jobs:
 
       - name: Analyse SonarCloud
         env:
-          SONAR_PROJECT_KEY: MarineRod_transport-back
-          SONAR_ORGANIZATION: marinerod
-          SONAR_HOST_URL: https://sonarcloud.io
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn clean verify sonar:sonar
+        run: mvn -X clean verify sonar:sonar -Dsonar.projectKey=MarineRod_transport-back -Dsonar.organization=marinerod -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
 
   build:
     name: Build du projet
