@@ -75,13 +75,13 @@ jobs:
       - name: Analyse SonarCloud                # Analyse SonarQube via SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Correspond à un secret défini dans le repository Github
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=transport-back
 
 #      - name: Vérification du Quality Gate      # On vérifie que le rapport SonarQube généré ne contient pas d'erreurs, si oui, le job est mis en erreur.
 #        env:
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 #        run: |
-#          PROJECT_KEY="Projet-CDA-Groupe-2-Gestion-transport_gestion-transport-back"
+#          PROJECT_KEY="transport-back"
 #
 #          echo "🔍 Vérification du Quality Gate pour le projet: $PROJECT_KEY"
 #
