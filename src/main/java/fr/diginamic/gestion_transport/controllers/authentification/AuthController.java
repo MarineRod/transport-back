@@ -57,7 +57,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody AuthRequest authRequest) {
         try {
+        	System.out.println(">>> REQUÊTE ARRIVÉE <<<");
         	System.out.println("Authentification tentée pour: " + authRequest.getUsername());
+        	System.out.println("Mot de passe reçu: " + authRequest.getPassword());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );

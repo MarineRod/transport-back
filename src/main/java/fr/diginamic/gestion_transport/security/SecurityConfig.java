@@ -36,7 +36,7 @@ public class SecurityConfig {
 	 * @throws Exception en cas de problème
 	 */
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	 SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	    http.csrf(AbstractHttpConfigurer::disable) // Désactiver CSRF
 	        .authorizeHttpRequests(authorize -> authorize
 	            .requestMatchers("/api/auth/**").permitAll() // Autoriser /api/auth sans authentification
@@ -54,7 +54,7 @@ public class SecurityConfig {
      * @throws Exception
      */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -62,7 +62,7 @@ public class SecurityConfig {
      * @return {@link PasswordEncoder}
      */
     @Bean
-    public PasswordEncoder passwordEncoder() {
+     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

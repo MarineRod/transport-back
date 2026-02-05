@@ -13,8 +13,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://gestion-transport-front-fpyb.vercel.app")
-                        .allowedOrigins("https://gestion-transport-front-qymw-gs68sr0nt-gestion-transport.vercel.app")
+                        .allowedOrigins("https://transport-front-nu.vercel.app")
                         .allowedOrigins("http://localhost:4200")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

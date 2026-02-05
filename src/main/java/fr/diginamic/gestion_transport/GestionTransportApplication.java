@@ -2,6 +2,7 @@ package fr.diginamic.gestion_transport;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * Démarre l'application Spring Boot
@@ -15,6 +16,8 @@ public class GestionTransportApplication {
 	 */
 	public static void main(String[] args) {
 		SpringApplication.run(GestionTransportApplication.class, args);
+	
 	}
-
+	
+    
 }

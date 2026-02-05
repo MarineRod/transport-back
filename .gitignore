@@ -4,6 +4,15 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Spring Boot - configuration sensible ###
+src/main/resources/application.properties
+src/main/resources/application-*.properties
+
+### Environnements ###
+.env
+.env.*
+
+
 ### STS ###
 .apt_generated
 .classpath
